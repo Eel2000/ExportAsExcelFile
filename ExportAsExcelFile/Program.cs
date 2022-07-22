@@ -1,10 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-using ExportAsExcelFile;
-using IronXL;
-using System.Reflection;
-using System.Drawing;
+﻿using ExportAsExcelFile;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using System.Diagnostics;
+using System.Drawing;
+using System.Reflection;
 
 Console.WriteLine("Starting to generate file....");
 const string fileLocation = @"C:\Users\CTRL TECH\Documents\SideProject\Sheets\";
@@ -196,16 +195,6 @@ using (var excel = new ExcelPackage())
     ////To be generated
     sheet.Row(3).Height = 40;//set the height of the whole row
 
-    //sheet.Cells[3, 3, 3, 5].AutoFitColumns();
-    //sheet.Cells[3, 3, 3, 5].Merge = true;
-    //sheet.Cells[3, 3, 3, 5].Style.Font.Bold = true;
-    //sheet.Cells[3, 3, 3, 5].Style.Font.Size = 16;
-    //sheet.Cells[3, 3, 3, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-    //sheet.Cells[3, 3, 3, 5].Style.Fill.SetBackground(Color.FromArgb(255, 231, 163));
-    //sheet.Cells[3, 3, 3, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-    //sheet.Cells[3, 3, 3, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-    //sheet.Cells[3, 3, 3, 5].Value = $"{DateTime.Now.DayOfWeek.ToString()} ({DateTime.Now.ToString("d")})";
-
     sheet.Column(2).Width = 20;
     //sheet.Cells[4, 2].AutoFitColumns();
     sheet.Cells[4, 2].Value = "Fullname";
@@ -217,57 +206,21 @@ using (var excel = new ExcelPackage())
     sheet.Cells[4, 2].Style.Font.Color.SetColor(Color.DarkOrange);
     sheet.Cells[4, 2].Style.Fill.SetBackground(Color.FromArgb(214, 214, 214));
 
-    //sheet.Cells[5, 2].Value = "Eliezer Bwana";
-    //sheet.Cells[5, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-    //sheet.Cells[5, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-    //sheet.Cells[5, 2].Style.Font.Size = 16;
-    //sheet.Cells[5, 2].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-
-    //sheet.Column(3).Width = 20;
-    ////sheet.Cells[4, 2].AutoFitColumns();
-    //sheet.Cells[4, 3].Value = "Entry Time";
-    //sheet.Cells[4, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-    //sheet.Cells[4, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-    //sheet.Cells[4, 3].Style.Font.Bold = true;
-    //sheet.Cells[4, 3].Style.Font.Size = 16;
-    //sheet.Cells[4, 3].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-    //sheet.Cells[4, 3].Style.Font.Color.SetColor(Color.DarkOrange);
-    //sheet.Cells[4, 3].Style.Fill.SetBackground(Color.FromArgb(214, 214, 214));
-
-    //sheet.Column(4).Width = 20;
-    ////sheet.Cells[4, 2].AutoFitColumns();
-    //sheet.Cells[4, 4].Value = "Exit Time";
-    //sheet.Cells[4, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-    //sheet.Cells[4, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-    //sheet.Cells[4, 4].Style.Font.Bold = true;
-    //sheet.Cells[4, 4].Style.Font.Size = 16;
-    //sheet.Cells[4, 4].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-    //sheet.Cells[4, 4].Style.Font.Color.SetColor(Color.DarkOrange);
-    //sheet.Cells[4, 4].Style.Fill.SetBackground(Color.FromArgb(214, 214, 214));
-
-    //sheet.Column(5).Width = 20;
-    ////sheet.Cells[4, 2].AutoFitColumns();
-    //sheet.Cells[4, 5].Value = "Duration";
-    //sheet.Cells[4, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-    //sheet.Cells[4, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-    //sheet.Cells[4, 5].Style.Font.Bold = true;
-    //sheet.Cells[4, 5].Style.Font.Size = 16;
-    //sheet.Cells[4, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
-    //sheet.Cells[4, 5].Style.Font.Color.SetColor(Color.DarkOrange);
-    //sheet.Cells[4, 5].Style.Fill.SetBackground(Color.FromArgb(214, 214, 214));
-
 
 
 
     var name = fileLocation + Assembly.GetExecutingAssembly().GetName().Name + "-" +
                 DateTime.Now.ToString("d") + ".xlsx";
+;
+    var p = excel.GetAsByteArray();
+    File.WriteAllBytes(name, p);
 
-    if (File.Exists(name))
-        File.Delete(name);
-
-    FileStream fileStream = File.Create(name);
-    fileStream.Close();
-
-    File.WriteAllBytes(name, excel.GetAsByteArray());
+    var proce = new Process();
+    proce.StartInfo = new ProcessStartInfo
+    {
+        UseShellExecute = true,
+        FileName = name
+    };
+    proce.Start();
     Console.WriteLine("Operation finished");
 }
