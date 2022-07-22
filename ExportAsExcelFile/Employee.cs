@@ -22,7 +22,7 @@ namespace ExportAsExcelFile
             ExitTime = exitTime;
         }
 
-        public Employee(int iD, string name, string firstName, DateTime entryTime, DateTime exitTime)
+        public Employee(int iD, string name, string firstName, DateTime? entryTime, DateTime? exitTime)
         {
             ID = iD;
             Name = name;
@@ -34,8 +34,8 @@ namespace ExportAsExcelFile
         public int ID { get; set; }=new Random().Next();
         public string Name { get; set; }
         public string FirstName { get; set; }
-        public DateTime EntryTime { get; set; }
-        public DateTime ExitTime { get; set; }
+        public DateTime? EntryTime { get; set; }
+        public DateTime? ExitTime { get; set; }
 
     }
 }

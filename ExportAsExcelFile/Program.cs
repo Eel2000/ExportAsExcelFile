@@ -12,7 +12,7 @@ var employees = new List<Employee>()
 {
     new Employee(1,"MBINDA", "Jean",DateTime.Now,DateTime.Now.AddHours(8)),
     new Employee(1,"MBINDA", "Jean",DateTime.Now,DateTime.Now.AddHours(8)),
-    new Employee(1,"MBINDA", "Jean",DateTime.Now,DateTime.Now.AddHours(8)),
+    new Employee(1,"MBINDA", "Jean",DateTime.Now,null),
     new Employee(1,"MBINDA", "Jean",DateTime.Now.AddDays(1),DateTime.Now.AddHours(1)),
     new Employee(1,"MBINDA", "Jean",DateTime.Now.AddDays(1),DateTime.Now.AddHours(1)),
     new Employee(1,"MBINDA", "Jean",DateTime.Now.AddDays(1),DateTime.Now.AddHours(1)),
@@ -26,7 +26,7 @@ var employees = new List<Employee>()
     new Employee(2,"KASONGO", "Eliel",DateTime.Now,DateTime.Now.AddHours(8)),
     new Employee(2,"KASONGO", "Eliel",DateTime.Now,DateTime.Now.AddHours(8)),
     new Employee(2,"KASONGO", "Eliel",DateTime.Now,DateTime.Now.AddHours(8)),
-    new Employee(2,"KASONGO", "Eliel",DateTime.Now.AddDays(1),DateTime.Now.AddHours(8)),
+    new Employee(2,"KASONGO", "Eliel",DateTime.Now.AddDays(1),null),
     new Employee(2,"KASONGO", "Eliel",DateTime.Now.AddDays(1),DateTime.Now.AddHours(8)),
     new Employee(2,"KASONGO", "Eliel",DateTime.Now.AddDays(1),DateTime.Now.AddHours(8)),
     new Employee(2,"KASONGO", "Eliel",DateTime.Now.AddDays(2),DateTime.Now.AddHours(8)),
@@ -66,7 +66,7 @@ using (var excel = new ExcelPackage())
 
 
 
-    var groupedEmployeesList = employees.GroupBy(x => x.EntryTime.DayOfWeek, (dayOfWeek, employeesList) => new
+    var groupedEmployeesList = employees.GroupBy(x => x.EntryTime?.DayOfWeek, (dayOfWeek, employeesList) => new
     {
         Day = dayOfWeek,
         EmployeeList = employeesList
@@ -93,7 +93,7 @@ using (var excel = new ExcelPackage())
         sheet.Cells[fromRowIndex, fromColIndex, toRowIndex, toColIndex].Style.Fill.SetBackground(Color.FromArgb(255, 231, 163));
         sheet.Cells[fromRowIndex, fromColIndex, toRowIndex, toColIndex].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         sheet.Cells[fromRowIndex, fromColIndex, toRowIndex, toColIndex].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-        sheet.Cells[fromRowIndex, fromColIndex, toRowIndex, toColIndex].Value = $"{dayData.Day} ({dayData.EmployeeList.First().EntryTime.ToString("d")})";
+        sheet.Cells[fromRowIndex, fromColIndex, toRowIndex, toColIndex].Value = $"{dayData.Day} ({dayData.EmployeeList.First().EntryTime?.ToString("d")})";
 
         //generate entry time col
         sheet.Column(fromColIndex).Width = 20;//set the entryTime col width to 20px
@@ -154,21 +154,26 @@ using (var excel = new ExcelPackage())
                 sheet.Cells[empStarInsertAtRow, colInsertValueFullNameAtIndex].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
                 //write his entry time
-                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Value = item.EntryTime.ToString("t");
+                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Value = item.EntryTime?.ToString("t") ?? "-";
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Style.Font.Size = 16;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 1].Style.Fill.SetBackground(item.EntryTime == null ? Color.Red : Color.White);
 
                 //write his exit time
-                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Value = item.ExitTime.ToString("t");
+                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Value = item.ExitTime?.ToString("t") ?? "-";
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Style.Font.Size = 16;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 2].Style.Fill.SetBackground(item.ExitTime == null ? Color.Red : Color.White);
 
+                var duration = TimeSpan.Zero;
+                if (item.EntryTime != null && item.ExitTime != null)
+                    duration = (TimeSpan)item.ExitTime?.Subtract(item.EntryTime.Value);
                 //write his exit time
-                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 3].Value = (item.ExitTime.Hour - item.EntryTime.Hour) + (item.ExitTime.Minute - item.EntryTime.Minute);
+                sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 3].Value = item.ExitTime != null ? $"{duration.ToString(@"hh\:mm")}" : "-";
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 sheet.Cells[empStarInsertAtRow, colInsertValuesForInfo + 3].Style.Font.Size = 16;
